@@ -1013,13 +1013,18 @@ def main() -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif state == "menu":
-                menu_sel, menu_sub, action = handle_menu_input(event, menu_sel, menu_sub, settings, sfx)
-                if action == "play":
-                    state, level_idx, stage, player, enemies, paused, show_map = begin_play(0)
-                elif action == "exit":
-                    running = False
-            elif event.type == pygame.MOUSEMOTION and state == "play" and not paused:
+                continue
+
+            if state == "menu":
+                if event.type == pygame.KEYDOWN:
+                    menu_sel, menu_sub, action = handle_menu_input(event, menu_sel, menu_sub, settings, sfx)
+                    if action == "play":
+                        state, level_idx, stage, player, enemies, paused, show_map = begin_play(0)
+                    elif action == "exit":
+                        running = False
+                continue
+
+            if event.type == pygame.MOUSEMOTION and state == "play" and not paused:
                 player.angle += event.rel[0] * sens
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if state == "play" and not paused:
@@ -1033,13 +1038,10 @@ def main() -> None:
                 if event.key == pygame.K_ESCAPE:
                     if state == "play":
                         paused = not paused
-                    elif state == "menu" and menu_sub:
-                        menu_sub = None
-                    elif state == "menu":
-                        running = False
                     else:
                         state = "menu"
                         menu_sub = None
+                        paused = False
                         pygame.mouse.set_visible(True)
                         pygame.event.set_grab(False)
                 elif event.key == pygame.K_q and state == "play":
